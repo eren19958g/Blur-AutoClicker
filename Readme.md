@@ -53,5 +53,5 @@ This project is licensed under the **GNU General Public License v3.0**.
 
 <p align="center">
     <em>"Made with confusion 😕. And Love, ofc"</em>
-    <img src="https://tenor.com/view/witch-watch-witch-watch-anime-nico-gif-17809044814573598781" width="250">
+    <img src="Resources/agif.gif" width="250">
 </p>

@@ -1,25 +1,26 @@
 # v2.1.0 - 22.02.2026 (d/m/y)
 ## ❇️ New Features:
+- Added Opt-in Telemetry Popup (Honestly didn't wanna do that but EU laws and stuff :3)
+- measure and log cpu usage
+- Changed Data collection from Google to Supabase
+- Moved ENTIE backend to Rust for better peformance
+- logging of clicker session time and total time, session clicks and total clicks
 
 ## 🔹 Changed:
 - updated file structure
 - Config.ini now saves at %appdata%/blur009/autoclicker/config.ini
 - split up main.py into individual files to reduce line count per file.
+- ReadMe Updated
 
 ## 🔺 Fix:
 
 ## 🔸 Performance Updates:
 
 ## 🪦 Removed:
-- Switch to Go was good, but I realized after way too much debugging that "runtime.cgocallback" took 84% of my runtime performance. So, back to C we go..
+- Switch to Go was good, but I realized after way too much debugging that syscall took 84% of my runtime performance. So, to Rust we go.. (Go was basically talking to itsself over and over to do the clicks, while Rust is doing it directly, which is why the performance increase is so big).
 
 ## TODO:
-- button for going to config folder
-- statistics (cpu, ram amount, cpu usage, ram usage, average cpu usage, clicker run time session/total, session clicks)
-- put statistics in telemetry
-- measure and log cpu time
-- Clicks centered around actual cursor position (free cursor click offset, smoothing support).
-
+- Display clicker session time and clicks in the UI
 
 # v2.0.0 - 18.02.2026 (d/m/y)
 ## ❇️ New Features:
