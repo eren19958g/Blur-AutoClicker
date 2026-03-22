@@ -16,6 +16,9 @@ clicker_engine.h
 version.txt
 /.venv
 cargo.lock
+.qtcreator
+NewUI
+
 
 # C extensions
 *.so

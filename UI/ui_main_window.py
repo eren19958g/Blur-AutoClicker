@@ -281,7 +281,7 @@ class Ui_BlurAutoClicker(object):
         self.DutyCycleInput.setButtonSymbols(
             QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.DutyCycleInput.setAccelerated(False)
-        self.DutyCycleInput.setMinimum(1)
+        self.DutyCycleInput.setMinimum(0.1)
         self.DutyCycleInput.setMaximum(100)
         self.DutyCycleInput.setSingleStep(5)
         self.DutyCycleInput.setValue(45)
