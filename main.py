@@ -36,7 +36,7 @@ from src.Py import telemetry
 from UI.ui_main_window import Ui_BlurAutoClicker as ui_main_window
 
 # --- Constants ---
-CURRENT_VERSION = "v2.1.1"
+CURRENT_VERSION = "v2.1.2"
 DEBUG_MODE = False
 
 ctypes.windll.kernel32.SetConsoleMode(
@@ -419,7 +419,7 @@ if __name__ == "__main__":
     def click_unit():
         unit_map = {"Second": "second", "Minute": "minute",
                     "Hour": "hour", "Day": "day"}
-        return unit_map.get(ui_widgets.click_interval_combobox.currentText().lower(), "second")
+        return unit_map.get(ui_widgets.click_interval_combobox.currentText(), "second")
 
     def click_position_enabled() -> bool:
         return advanced_mode_enabled() and ui_widgets.position_options_checkbox.isChecked()
