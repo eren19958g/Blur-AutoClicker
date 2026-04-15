@@ -232,9 +232,11 @@ export function captureMouseHotkey(event: {
   ctrlKey: boolean;
   altKey: boolean;
   shiftKey: boolean;
-  metaKey: boolean;
-}): string | null {
+  metaKey: boolean;},
+  clickerMouseButton?: string 
+): string | null {
   const mouseMap: Record<number, string> = {
+    0: "mouseleft",
     1: "mousemiddle",
     2: "mouseright",
     3: "mouse4",
@@ -243,6 +245,15 @@ export function captureMouseHotkey(event: {
 
   const mainKey = mouseMap[event.button];
   if (!mainKey) return null; // left click (0) or unknown
+
+  if (clickerMouseButton === "Left" && mainKey === "mouseleft") return null;
+  if (clickerMouseButton === "Middle" && mainKey === "mousemiddle") return null;
+  if (clickerMouseButton === "Right" && mainKey === "mouseright") return null;
+
+  if (event.button === 0) { // allow Left click with modifier
+    const hasModifier = event.ctrlKey || event.altKey || event.shiftKey || event.metaKey;
+    if (!hasModifier) return null;
+  }
 
   const parts: string[] = [];
   if (event.ctrlKey) parts.push("ctrl");

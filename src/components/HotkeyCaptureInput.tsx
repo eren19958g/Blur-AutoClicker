@@ -22,7 +22,8 @@ export default function HotkeyCaptureInput({
   style,
 }: Props) {
   const [listening, setListening] = useState(false);
-  const [layoutMap, setLayoutMap] = useState<Awaited<ReturnType<typeof getKeyboardLayoutMap>>>(null);
+  const [layoutMap, setLayoutMap] =
+    useState<Awaited<ReturnType<typeof getKeyboardLayoutMap>>>(null);
 
   useEffect(() => {
     let active = true;
@@ -53,11 +54,15 @@ export default function HotkeyCaptureInput({
   }, [listening]);
 
   const displayText = useMemo(
-    () => (listening ? "Press keys..." : formatHotkeyForDisplay(value, layoutMap)),
+    () =>
+      listening ? "Press keys..." : formatHotkeyForDisplay(value, layoutMap),
     [layoutMap, listening, value],
   );
 
-  const acceptHotkey = (nextHotkey: string | null, target: HTMLInputElement) => {
+  const acceptHotkey = (
+    nextHotkey: string | null,
+    target: HTMLInputElement,
+  ) => {
     if (!nextHotkey) return;
     onChange(nextHotkey);
     setListening(false);
@@ -92,7 +97,14 @@ export default function HotkeyCaptureInput({
 
   const handleMouseDown = (event: React.MouseEvent<HTMLInputElement>) => {
     // Left click (button 0) is used to start listening — don't capture it
-    if (!listening || event.button === 0) return;
+    // if no modifier is present.
+    if (!listening) return;
+
+    if (event.button === 0) {
+      const hasModifier =
+        event.ctrlKey || event.altKey || event.shiftKey || event.metaKey;
+      if (!hasModifier) return;
+    }
 
     event.preventDefault();
     event.stopPropagation();
