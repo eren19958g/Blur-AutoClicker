@@ -1,5 +1,5 @@
 use crate::app_state::ClickerState;
-use crate::engine::mouse::{current_virtual_screen_rect, VirtualScreenRect};
+use crate::engine::mouse::{current_monitor_rects, current_virtual_screen_rect, VirtualScreenRect};
 use std::sync::atomic::Ordering;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
@@ -71,6 +71,19 @@ pub fn show_overlay(app: &AppHandle) -> Result<(), String> {
     *LAST_ZONE_SHOW.lock().unwrap() = Some(Instant::now());
 
     let settings = state.settings.lock().unwrap();
+    let monitors = current_monitor_rects().unwrap_or_else(|| vec![bounds]);
+    let monitor_payload: Vec<_> = monitors
+        .into_iter()
+        .map(|monitor| {
+            let offset = monitor.offset_from(bounds);
+            serde_json::json!({
+                "x": offset.left,
+                "y": offset.top,
+                "width": offset.width,
+                "height": offset.height,
+            })
+        })
+        .collect();
     let _ = window.emit(
         "zone-data",
         serde_json::json!({
@@ -86,6 +99,7 @@ pub fn show_overlay(app: &AppHandle) -> Result<(), String> {
             "cornerStopBR": settings.corner_stop_br,
             "screenWidth": bounds.width,
             "screenHeight": bounds.height,
+            "monitors": monitor_payload,
             "_showDisabledEdges": !settings.edge_stop_enabled,
             "_showDisabledCorners": !settings.corner_stop_enabled,
         }),

@@ -23,6 +23,16 @@ pub struct VirtualScreenRect {
 
 impl VirtualScreenRect {
     #[inline]
+    pub fn new(left: i32, top: i32, width: i32, height: i32) -> Self {
+        Self {
+            left,
+            top,
+            width,
+            height,
+        }
+    }
+
+    #[inline]
     pub fn right(self) -> i32 {
         self.left + self.width
     }
@@ -30,6 +40,21 @@ impl VirtualScreenRect {
     #[inline]
     pub fn bottom(self) -> i32 {
         self.top + self.height
+    }
+
+    #[inline]
+    pub fn contains(self, x: i32, y: i32) -> bool {
+        x >= self.left && x < self.right() && y >= self.top && y < self.bottom()
+    }
+
+    #[inline]
+    pub fn offset_from(self, origin: VirtualScreenRect) -> Self {
+        Self::new(
+            self.left - origin.left,
+            self.top - origin.top,
+            self.width,
+            self.height,
+        )
     }
 }
 
@@ -55,12 +80,60 @@ pub fn current_virtual_screen_rect() -> Option<VirtualScreenRect> {
         return None;
     }
 
-    Some(VirtualScreenRect {
-        left,
-        top,
-        width,
-        height,
-    })
+    Some(VirtualScreenRect::new(left, top, width, height))
+}
+
+#[cfg(target_os = "windows")]
+pub fn current_monitor_rects() -> Option<Vec<VirtualScreenRect>> {
+    use std::ptr;
+    use windows_sys::Win32::Foundation::RECT;
+    use windows_sys::Win32::Graphics::Gdi::{EnumDisplayMonitors, GetMonitorInfoW, MONITORINFO};
+
+    unsafe extern "system" fn enum_monitor_proc(
+        monitor: isize,
+        _hdc: isize,
+        _clip_rect: *mut RECT,
+        user_data: isize,
+    ) -> i32 {
+        let monitors = &mut *(user_data as *mut Vec<VirtualScreenRect>);
+        let mut info = std::mem::zeroed::<MONITORINFO>();
+        info.cbSize = std::mem::size_of::<MONITORINFO>() as u32;
+
+        if GetMonitorInfoW(monitor, &mut info as *mut MONITORINFO as *mut _) == 0 {
+            return 1;
+        }
+
+        let rect = info.rcMonitor;
+        let width = rect.right - rect.left;
+        let height = rect.bottom - rect.top;
+        if width > 0 && height > 0 {
+            monitors.push(VirtualScreenRect::new(rect.left, rect.top, width, height));
+        }
+
+        1
+    }
+
+    let mut monitors = Vec::new();
+    let ok = unsafe {
+        EnumDisplayMonitors(
+            0,
+            ptr::null(),
+            Some(enum_monitor_proc),
+            &mut monitors as *mut Vec<VirtualScreenRect> as isize,
+        )
+    };
+
+    if ok == 0 || monitors.is_empty() {
+        return current_virtual_screen_rect().map(|screen| vec![screen]);
+    }
+
+    monitors.sort_by_key(|monitor| (monitor.top, monitor.left));
+    Some(monitors)
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn current_monitor_rects() -> Option<Vec<VirtualScreenRect>> {
+    current_virtual_screen_rect().map(|screen| vec![screen])
 }
 
 #[inline]
