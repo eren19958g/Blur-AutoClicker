@@ -197,7 +197,11 @@ export default function App() {
   };
 
   const handleWindowClose = async () => {
-    await getCurrentWindow().close();
+    if (uiSettingsRef.current.minimizeToTray) {
+      await getCurrentWindow().hide();
+    } else {
+      await invoke("quit_app");
+    }
   };
 
   useEffect(() => {

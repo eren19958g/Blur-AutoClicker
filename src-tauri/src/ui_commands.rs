@@ -144,3 +144,10 @@ pub fn get_stats() -> Result<CumulativeStats, String> {
 pub fn reset_stats() -> Result<CumulativeStats, String> {
     crate::engine::stats::reset_stats()
 }
+
+#[tauri::command]
+pub fn quit_app() {
+    crate::overlay::OVERLAY_THREAD_RUNNING
+        .store(false, std::sync::atomic::Ordering::SeqCst);
+    std::process::exit(0);
+}

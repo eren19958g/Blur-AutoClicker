@@ -278,6 +278,26 @@ export default function SettingsPanel({
         <div className="settings-divider" />
         <div className="settings-row">
           <div className="settings-label-group">
+            <span className="settings-label">Minimize to Tray</span>
+            <span className="settings-sublabel">
+              When enabled, closing the window hides it to the system tray instead of quitting.
+            </span>
+          </div>
+          <div className="settings-seg-group">
+            {["On", "Off"].map((o) => (
+              <button
+                key={o}
+                className={`settings-seg-btn ${(settings.minimizeToTray ? "On" : "Off") === o ? "active" : ""}`}
+                onClick={() => update({ minimizeToTray: o === "On" })}
+              >
+                {o}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="settings-divider" />
+        <div className="settings-row">
+          <div className="settings-label-group">
             <span className="settings-label">Theme</span>
             <span className="settings-sublabel">
               Switch between Dark and light themes.

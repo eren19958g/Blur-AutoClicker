@@ -14,7 +14,10 @@ use crate::hotkeys::register_hotkey_inner;
 use crate::hotkeys::start_hotkey_listener;
 use std::sync::atomic::{AtomicBool, AtomicU64};
 use std::sync::{Arc, Mutex};
+use tauri::menu::{Menu, MenuItem};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{AppHandle, Emitter, Manager};
+
 const STATUS_EVENT: &str = "clicker-status";
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -44,6 +47,44 @@ pub fn run() {
                         .build(),
                 );
             }
+
+            let show_item = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
+            let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&show_item, &quit_item])?;
+
+            TrayIconBuilder::new()
+                .icon(app.default_window_icon().unwrap().clone())
+                .menu(&menu)
+                .tooltip("BlurAutoClicker")
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "show" => {
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                    "quit" => {
+                        crate::overlay::OVERLAY_THREAD_RUNNING
+                            .store(false, std::sync::atomic::Ordering::SeqCst);
+                        std::process::exit(0);
+                    }
+                    _ => {}
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } = event
+                    {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                })
+                .build(app)?;
 
             let auto_hide_handle = app.handle().clone();
             std::thread::spawn(move || {
@@ -105,30 +146,26 @@ pub fn run() {
             ui_commands::reset_stats,
             updates::update_checker::check_for_updates,
             overlay::hide_overlay,
+            ui_commands::quit_app,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app_handle, event| {
             if let tauri::RunEvent::WindowEvent {
-                event: tauri::WindowEvent::CloseRequested { .. },
+                event: tauri::WindowEvent::CloseRequested { api, .. },
                 label,
                 ..
             } = &event
             {
                 if label == "main" {
-                    crate::overlay::OVERLAY_THREAD_RUNNING
-                        .store(false, std::sync::atomic::Ordering::SeqCst);
-                    if let Some(overlay) = app_handle.get_webview_window("overlay") {
-                        let _ = overlay.destroy();
+                    api.prevent_close();
+                    if let Some(window) = app_handle.get_webview_window("main") {
+                        let _ = window.hide();
                     }
                 }
             }
-            if let tauri::RunEvent::ExitRequested { .. } = &event {
-                crate::overlay::OVERLAY_THREAD_RUNNING
-                    .store(false, std::sync::atomic::Ordering::SeqCst);
-                if let Some(overlay) = app_handle.get_webview_window("overlay") {
-                    let _ = overlay.destroy();
-                }
+            if let tauri::RunEvent::ExitRequested { api, .. } = &event {
+                api.prevent_exit();
             }
         });
 }

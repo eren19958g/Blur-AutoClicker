@@ -47,6 +47,7 @@ export interface Settings {
   showStopReason: boolean;
   showStopOverlay: boolean;
   theme: Theme;
+  minimizeToTray: boolean;
 }
 
 export interface ClickerStatus {
@@ -100,6 +101,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showStopReason: true,
   showStopOverlay: true,
   theme: "dark",
+  minimizeToTray: true,
 };
 
 function sanitizeSavedPanel(value: unknown): SavedPanel {
