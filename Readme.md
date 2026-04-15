@@ -63,7 +63,7 @@ The old Config and Stats files will unfortunately not be compatible with the new
 ---
 
 ## Support the project!
-[![ko-fi](https://www.ko-fi.com/img/donate_sm.png)]([https://ko-fi.com/blur009)
+[![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/blur009)
 
 You can also support the project by starring the repository and sharing it with your friends :). Thank you for your support!
 
