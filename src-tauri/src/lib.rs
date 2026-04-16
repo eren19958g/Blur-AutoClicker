@@ -160,7 +160,7 @@ pub fn run() {
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
-        .run(|_app_handle, event| {
+        .run(|app_handle, event| {
             if let tauri::RunEvent::WindowEvent {
                 event: tauri::WindowEvent::CloseRequested { api, .. },
                 label,
@@ -171,7 +171,7 @@ pub fn run() {
                     api.prevent_close();
                     crate::overlay::OVERLAY_THREAD_RUNNING
                         .store(false, std::sync::atomic::Ordering::SeqCst);
-                    std::process::exit(0);
+                    app_handle.exit(0);
                 }
             }
         });
