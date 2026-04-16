@@ -101,7 +101,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showStopReason: true,
   showStopOverlay: true,
   theme: "dark",
-  minimizeToTray: true,
+  minimizeToTray: false,
 };
 
 function sanitizeSavedPanel(value: unknown): SavedPanel {
@@ -235,6 +235,7 @@ function sanitizeSettings(input?: Partial<Settings> | null): Settings {
     explanationMode: sanitizeExplanationMode(saved),
     lastPanel: sanitizeSavedPanel(saved.lastPanel),
     theme: saved.theme === "light" ? "light" : "dark",
+    minimizeToTray: sanitizeBoolean(saved.minimizeToTray, false),
   };
 }
 

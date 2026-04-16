@@ -356,7 +356,9 @@ export default function SettingsPanel({
             className="settings-btn-danger"
             onClick={() => {
               setResetting(true);
-              onReset().finally(() => setResetting(false));
+              onReset()
+                .then(() => setAutostartEnabled(false))
+                .finally(() => setResetting(false));
             }}
           >
             {resetting ? "Resetting..." : "Reset"}

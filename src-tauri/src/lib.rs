@@ -67,7 +67,7 @@ pub fn run() {
                     "quit" => {
                         crate::overlay::OVERLAY_THREAD_RUNNING
                             .store(false, std::sync::atomic::Ordering::SeqCst);
-                        std::process::exit(0);
+                        app.exit(0);
                     }
                     _ => {}
                 })
@@ -160,7 +160,7 @@ pub fn run() {
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
-        .run(|app_handle, event| {
+        .run(|_app_handle, event| {
             if let tauri::RunEvent::WindowEvent {
                 event: tauri::WindowEvent::CloseRequested { api, .. },
                 label,
@@ -169,13 +169,10 @@ pub fn run() {
             {
                 if label == "main" {
                     api.prevent_close();
-                    if let Some(window) = app_handle.get_webview_window("main") {
-                        let _ = window.hide();
-                    }
+                    crate::overlay::OVERLAY_THREAD_RUNNING
+                        .store(false, std::sync::atomic::Ordering::SeqCst);
+                    std::process::exit(0);
                 }
-            }
-            if let tauri::RunEvent::ExitRequested { api, .. } = &event {
-                api.prevent_exit();
             }
         });
 }

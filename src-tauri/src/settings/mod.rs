@@ -41,6 +41,7 @@ pub struct ClickerSettings {
     pub last_panel: String,
     pub show_stop_reason: bool,
     pub show_stop_overlay: bool,
+    pub minimize_to_tray: bool,
 }
 
 impl Default for ClickerSettings {
@@ -82,6 +83,7 @@ impl Default for ClickerSettings {
             last_panel: "simple".to_string(),
             show_stop_reason: true,
             show_stop_overlay: true,
+            minimize_to_tray: false,
         }
     }
 }
